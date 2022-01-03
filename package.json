@@ -1,0 +1,22 @@
+{
+  "name": "upgrayedd",
+  "version": "1.0.0",
+  "description": "Upgrade npm packages with more confidence",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pocuslabs/upgrayyed.git"
+  },
+  "author": "Austin Pocus",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pocuslabs/upgrayyed/issues"
+  },
+  "homepage": "https://github.com/pocuslabs/upgrayyed#readme",
+  "dependencies": {
+    "semver": "^7.3.5"
+  }
+}
