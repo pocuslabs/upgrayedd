@@ -11,21 +11,34 @@ const getPackage = async (packageName) => {
 };
 
 const upgrayedd = async () => {
-  const fileContents = await fs.readFile("package.json");
-  const { dependencies, devDependencies } = JSON.parse(fileContents);
+  const packageJson = JSON.parse(await fs.readFile("package.json"));
+  const packageLock = JSON.parse(await fs.readFile("package-lock.json"));
+  const { dependencies, devDependencies } = packageJson;
 
-  const outdated = Object.entries(dependencies).filter(async ([packageName, version]) => {
-    const registryData = await getPackage(packageName);
-    const latestVersion = registryData["dist-tags"].latest;
-    if (semver.lt(semver.coerce(version), latestVersion)) {
-      return true;
+  let outdated = [];
+  for (let [packageName, versionSpec] of Object.entries(dependencies)) {
+    const actualVersion = packageLock.packages[`node_modules/${packageName}`]?.version;
+    if (!actualVersion) {
+      console.log(`Package ${packageName} (${versionSpec}) is not installed yet.`);
+      continue;
     }
-  });
+
+    const registryData = await getPackage(packageName);
+    console.log("PACKAGE NAME", packageName);
+    const latestVersion = registryData["dist-tags"].latest;
+    if (semver.lt(actualVersion, latestVersion)) {
+      outdated.push({
+        packageName,
+        versionSpect,
+        actualVersion
+      });
+    }
+  }
 
   if (outdated.length) {
-    outdated.forEach(([packageName, version]) => {
-      console.log(`${packageName} (${version}) is out of date!`);
-    });
+    for (let package of outdated) {
+      console.log(`${package.packageName} (${package.actualVersion}) is out of date!`);
+    }
   } else {
     console.log("All up to date! Take a break.")
   }
