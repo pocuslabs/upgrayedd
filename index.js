@@ -5,25 +5,26 @@ const semver = require("semver");
 const axios = require("axios")
 const BASE_NPM_URL = "https://registry.npmjs.org";
 
-const getPackage = async (packageName) => {
+const fetchPackage = async (packageName) => {
   const res = await axios.get(`${BASE_NPM_URL}/${packageName}`);
   return res.data;
 };
 
-const upgrayedd = async () => {
-  const packageJson = JSON.parse(await fs.readFile("package.json"));
-  const packageLock = JSON.parse(await fs.readFile("package-lock.json"));
+let upgrayedd = async (packageJsonFile, packageLockFile) => {
+  const packageJson = JSON.parse(await fs.readFile(packageJsonFile));
+  const packageLock = JSON.parse(await fs.readFile(packageLockFile));
   const { dependencies, devDependencies } = packageJson;
 
   let outdated = [];
   for (let [packageName, versionSpec] of Object.entries(dependencies)) {
-    const actualVersion = packageLock.packages[`node_modules/${packageName}`]?.version;
+    const installedPackage = packageLock.packages[`node_modules/${packageName}`]
+    const actualVersion = installedPackage?.version;
     if (!actualVersion) {
       console.log(`Package ${packageName} (${versionSpec}) is not installed yet.`);
       continue;
     }
 
-    const registryData = await getPackage(packageName);
+    const registryData = await fetchPackage(packageName);
     console.log("PACKAGE NAME", packageName);
     const latestVersion = registryData["dist-tags"].latest;
     if (semver.lt(actualVersion, latestVersion)) {
@@ -36,16 +37,24 @@ const upgrayedd = async () => {
   }
 
   if (outdated.length) {
-    for (let package of outdated) {
-      console.log(`${package.packageName} (${package.actualVersion}) is out of date!`);
-    }
+    return outdated;
   } else {
     console.log("All up to date! Take a break.")
+    return [];
   }
 };
 
+upgrayedd.main = () => {
+  const packageJson = "package.json"
+  const packageLock = "package-lock.json"
+  return upgrayedd(packageJson, packageLock);
+}
+
 if (require.main === module) {
-    upgrayedd();
+  const outdated = upgrayedd();
+  for (let package of outdated) {
+    console.log(`${package.packageName} (${package.actualVersion}) is out of date!`);
+  }
 }
 
 exports = module.exports = upgrayedd;
