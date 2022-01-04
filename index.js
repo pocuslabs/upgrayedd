@@ -10,38 +10,31 @@ let upgrayedd = async (packageJsonFile, packageLockFile) => {
   const packageLock = JSON.parse(await fs.readFile(packageLockFile));
   const { dependencies, devDependencies } = packageJson;
 
-  let outdated = [];
-  for (let [packageName, versionSpec] of Object.entries(dependencies)) {
+  let packages = Object.entries(dependencies).reduce(async (acc, [packageName, versionSpec]) => {
     const installedPackage = packageLock.packages[`node_modules/${packageName}`]
     const actualVersion = installedPackage?.version;
     if (!actualVersion) {
       console.log(`Package ${packageName} (${versionSpec}) is not installed yet.`);
-      continue;
+      return acc;
     }
 
     const registryData = await upgrayedd.fetchPackage(packageName);
     const latestVersion = registryData["dist-tags"].latest;
 
-    let packageResult = {
+    acc[packageName] = {
       packageName,
       versionSpec,
       actualVersion,
       latestVersion,
       outOfDate: semver.lt(actualVersion, latestVersion),
-      satisfied: semver.satisfies(actualVersion, versionSpec)
+      satisfied: semver.satisfies(actualVersion, versionSpec),
+      deprecated: false  // TODO: this will be going away once I get the github API integration up
     };
 
-    if (packageResult.outOfDate) {
-      outdated.push(packageResult);
-    }
-  }
+    return acc;
+  }, {});
 
-  if (outdated.length) {
-    return outdated;
-  } else {
-    console.log("All up to date! Take a break.")
-    return [];
-  }
+  return packages;
 };
 
 upgrayedd.fetchPackage = async (packageName) => {
