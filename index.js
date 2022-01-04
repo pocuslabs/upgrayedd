@@ -25,14 +25,19 @@ let upgrayedd = async (packageJsonFile, packageLockFile) => {
     }
 
     const registryData = await fetchPackage(packageName);
-    console.log("PACKAGE NAME", packageName);
     const latestVersion = registryData["dist-tags"].latest;
-    if (semver.lt(actualVersion, latestVersion)) {
-      outdated.push({
-        packageName,
-        versionSpect,
-        actualVersion
-      });
+
+    let packageResult = {
+      packageName,
+      versionSpec,
+      actualVersion,
+      latestVersion,
+      outOfDate: semver.lt(actualVersion, latestVersion),
+      satisfied: semver.satisfies(actualVersion, versionSpec)
+    };
+
+    if (packageSpec.outOfDate) {
+      outdated.push(packageSpec);
     }
   }
 
