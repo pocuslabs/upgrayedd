@@ -1,18 +1,25 @@
 #!/usr/bin/env node
 
-import { promises as fs } from "fs"
-import semver from "semver"
-import "core-js/stable";
-import "regenerator-runtime/runtime";
+const fs = require("fs").promises;
+const semver = require("semver");
+const axios = require("axios")
+const BASE_NPM_URL = "https://registry.npmjs.org";
+
+const getPackage = async (packageName) => {
+  console.log(await axios.get(`${BASE_NPM_URL}/${packageName}`))
+};
 
 const upgrayedd = async () => {
   const fileContents = await fs.readFile("package.json");
-  const packageJson = JSON.parse(fileContents);
-  console.log(packageJson);
+  const { dependencies, devDependencies } = JSON.parse(fileContents);
+
+  for (let [packageName, version] of Object.entries(dependencies)) {
+    getPackage(packageName);
+  }
 };
 
 if (require.main === module) {
     upgrayedd();
 }
 
-export default upgrayedd
+exports = module.exports = upgrayedd;
