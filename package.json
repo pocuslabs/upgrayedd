@@ -4,6 +4,8 @@
   "description": "Upgrade npm packages with more confidence",
   "main": "index.js",
   "scripts": {
+    "build": "babel index.js -d dist",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -17,6 +19,14 @@
   },
   "homepage": "https://github.com/pocuslabs/upgrayyed#readme",
   "dependencies": {
+    "core-js": "^3.20.2",
+    "regenerator-runtime": "^0.13.9",
     "semver": "^7.3.5"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.16.7",
+    "@babel/core": "^7.16.7",
+    "@babel/node": "^7.16.7",
+    "@babel/preset-env": "^7.16.7"
   }
 }
