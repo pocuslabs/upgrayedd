@@ -18,7 +18,10 @@ jobs:
     steps:
       - checkout
       - run:
-          name: "Run tests"
+          name: "Install"
+          command: "npm install -g npm && npm install"
+      - run:
+          name: "Test"
           command: "npm test"
 
 # Invoke jobs via workflows
