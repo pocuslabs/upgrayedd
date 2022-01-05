@@ -17,15 +17,6 @@ const parseLockFile = async (lockFileName) => {
   }];
 };
 
-upgrayedd.fetchPackage = async (packageName) => {
-  const res = await axios.get(`${BASE_NPM_URL}/${packageName}`);
-  return res.data;
-};
-
-upgrayedd.fetchReleases = async (packageName) => {
-  return;
-};
-
 let upgrayedd = async (packageLockFile) => {
   const [lockFile, dependencies] = await parseLockFile(packageLockFile);
 
@@ -39,9 +30,8 @@ let upgrayedd = async (packageLockFile) => {
     }
 
     const registryData = await upgrayedd.fetchPackage(packageName);
-    console.log("REG", registryData)
     const latestVersion = registryData["dist-tags"].latest;
-    const releases = await fetchReleases(registryData.repository.url);
+    const releases = await upgrayedd.fetchReleases(registryData.repository.url);
 
     packages[packageName] = {
       packageName,
@@ -57,6 +47,20 @@ let upgrayedd = async (packageLockFile) => {
   return packages;
 };
 
+upgrayedd.fetchPackage = async (packageName) => {
+  const res = await axios.get(`${BASE_NPM_URL}/${packageName}`);
+  return res.data;
+};
+
+upgrayedd.fetchReleases = async (gitUrl) => {
+  const gitUrlRegex = new RegExp("github\.com/(.+?)/(.+?).git$");
+  const matchResult = gitUrl.match(gitUrlRegex);
+  if (!matchResult) { return; }
+  const [totalMatch, owner, repoName] = matchResult;
+  console.log(owner, repoName);
+  return;
+};
+
 upgrayedd.main = () => {
   const packageLock = "package-lock.json"
   return upgrayedd(packageLock);
@@ -65,7 +69,7 @@ upgrayedd.main = () => {
 if (require.main === module) {
   (async function () {
     const outdated = await upgrayedd("package-lock.json");
-    for (let package of outdated) {
+    for (let [packageName, package] of Object.entries(outdated)) {
       console.log(`${package.packageName} (${package.actualVersion}) is out of date!`);
     }
   })();
