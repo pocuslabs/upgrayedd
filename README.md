@@ -1,6 +1,7 @@
 # upgrayedd
 
 ![NPM badge](https://img.shields.io/npm/v/@pocuslabs/upgrayedd)
+![CircleCI badge](https://img.shields.io/circleci/build/github/pocuslabs/upgrayedd)
 
 Upgrade packages with confidence
 
