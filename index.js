@@ -32,9 +32,13 @@ let upgrayedd = async (packageLockFile) => {
 
     const registryData = await upgrayedd.fetchPackage(packageName);
     const latestVersion = registryData["dist-tags"].latest;
-    const deprecations = await upgrayedd.fetchReleases(registryData.repository.url, {
-      actualVersion, latestVersion
-    });
+    const gitUrl = registryData?.repository?.url;
+    let deprecations = [];
+    if (gitUrl) {
+      deprecations = await upgrayedd.fetchReleases(gitUrl, {
+        actualVersion, latestVersion
+      });
+    }
 
     packages[packageName] = {
       packageName,
