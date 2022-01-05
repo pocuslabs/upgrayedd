@@ -1,6 +1,6 @@
 # upgrayedd
 
-![NPM badge][https://img.shields.io/npm/v/@pocuslabs/upgrayedd]
+![NPM badge](https://img.shields.io/npm/v/@pocuslabs/upgrayedd)
 
 Upgrade packages with confidence
 
