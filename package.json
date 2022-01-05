@@ -1,6 +1,6 @@
 {
   "name": "@pocuslabs/upgrayedd",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Upgrade npm packages with confidence",
   "main": "index.js",
   "scripts": {
