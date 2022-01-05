@@ -1,5 +1,5 @@
 {
-  "name": "upgrayedd",
+  "name": "@pocuslabs/upgrayedd",
   "version": "1.0.0",
   "description": "Upgrade npm packages with confidence",
   "main": "index.js",
@@ -25,5 +25,14 @@
     "chai": "^4.3.4",
     "mocha": "^9.1.3",
     "sinon": "^12.0.1"
-  }
+  },
+  "directories": {
+    "test": "test"
+  },
+  "keywords": [
+    "javascript",
+    "npm",
+    "deprecation",
+    "tools"
+  ]
 }
