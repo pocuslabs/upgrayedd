@@ -19,8 +19,6 @@
   "homepage": "https://github.com/pocuslabs/upgrayyed#readme",
   "dependencies": {
     "axios": "^0.24.0",
-    "core-js": "^3.20.2",
-    "regenerator-runtime": "^0.13.9",
     "semver": "^7.3.5"
   },
   "devDependencies": {
