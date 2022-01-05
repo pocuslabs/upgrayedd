@@ -5,23 +5,33 @@ const semver = require("semver");
 const axios = require("axios")
 const BASE_NPM_URL = "https://registry.npmjs.org";
 
-let upgrayedd = async (packageJsonFile, packageLockFile) => {
-  const packageJson = JSON.parse(await fs.readFile(packageJsonFile));
-  const packageLock = JSON.parse(await fs.readFile(packageLockFile));
-  const { dependencies, devDependencies } = packageJson;
+const parseLockFile = async (lockFileName) => {
+  const rawContents = await fs.readFile(lockFileName);
+  const lockFile = JSON.parse(rawContents);
+  const { dependencies, devDependencies } = lockFile.packages[""];
 
-  let packages = Object.entries(dependencies).reduce(async (acc, [packageName, versionSpec]) => {
-    const installedPackage = packageLock.packages[`node_modules/${packageName}`]
+  return [lockFile, {
+    ...devDependencies,
+    ...dependencies
+  }];
+};
+
+let upgrayedd = async (packageLockFile) => {
+  const [lockFile, dependencies] = await parseLockFile(packageLockFile);
+
+  let packages = {};
+  for (let [packageName, versionSpec] of Object.entries(dependencies)) {
+    const installedPackage = lockFile.packages[`node_modules/${packageName}`]
     const actualVersion = installedPackage?.version;
     if (!actualVersion) {
       console.log(`Package ${packageName} (${versionSpec}) is not installed yet.`);
-      return acc;
+      continue;
     }
 
     const registryData = await upgrayedd.fetchPackage(packageName);
     const latestVersion = registryData["dist-tags"].latest;
 
-    acc[packageName] = {
+    packages[packageName] = {
       packageName,
       versionSpec,
       actualVersion,
@@ -30,9 +40,7 @@ let upgrayedd = async (packageJsonFile, packageLockFile) => {
       satisfied: semver.satisfies(actualVersion, versionSpec),
       deprecated: false  // TODO: this will be going away once I get the github API integration up
     };
-
-    return acc;
-  }, {});
+  }
 
   return packages;
 };
@@ -43,9 +51,8 @@ upgrayedd.fetchPackage = async (packageName) => {
 };
 
 upgrayedd.main = () => {
-  const packageJson = "package.json"
   const packageLock = "package-lock.json"
-  return upgrayedd(packageJson, packageLock);
+  return upgrayedd(packageLock);
 }
 
 if (require.main === module) {
