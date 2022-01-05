@@ -1,8 +1,9 @@
 {
   "name": "@pocuslabs/upgrayedd",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Upgrade npm packages with confidence",
   "main": "index.js",
+  "bin": "index.js",
   "scripts": {
     "start": "node index.js",
     "test": "mocha"
