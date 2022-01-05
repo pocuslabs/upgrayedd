@@ -58,5 +58,27 @@ describe("upgrayedd", function () {
     expect(axios.deprecated).to.be.false;
   });
 
-  it("warns when there is a deprecation");
+  it("warns when there is a deprecation", async function () {
+    this.sandbox.stub(upgrayedd, "fetchPackage").returns({
+      repository: {
+        url: "git+https://github.com/pocuslabs/upgrayyed.git"
+      },
+      "dist-tags": {
+        latest: "1.0.1"
+      }
+    });
+
+    this.sandbox.stub(upgrayedd, "fetchReleases").returns([
+      "Deprecated: sifting through release logs by hand"
+    ]);
+
+    const lockFile = "./test/data/hard-warning-package-lock.json";
+    const result = await upgrayedd(lockFile);
+    const axios = result["axios"];
+    
+    expect(axios.outOfDate).to.be.true;
+    expect(axios.satisfied).to.be.false;
+    expect(axios.deprecated).to.be.true;
+    expect(axios.deprecations.length).to.equal(1);
+  });
 });
