@@ -86,6 +86,10 @@ upgrayedd.fetchReleases = async (gitUrl, { actualVersion, latestVersion }) => {
   newerVersions.reverse();
   let deprecations = [];
   for (let release of newerVersions) {
+    if (!release?.body) {
+      continue;
+    }
+    
     const releaseLines = release.body.split("\r\n");
     for (let line of releaseLines) {
       if (line.match("deprec")) {
@@ -104,7 +108,8 @@ upgrayedd.main = () => {
 
 if (require.main === module) {
   (async function () {
-    const deprecations = await upgrayedd("package-lock.json");
+    const lockFileName = process.argv[2] || "package-lock.json"
+    const deprecations = await upgrayedd(lockFileName);
     for (let [packageName, package] of Object.entries(deprecations)) {
       console.log(`${package.packageName} (${package.actualVersion}) is out of date!`);
       if (package.deprecations?.length) {
