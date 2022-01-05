@@ -46,7 +46,7 @@ let upgrayedd = async (packageLockFile) => {
       actualVersion,
       latestVersion,
       outOfDate: semver.lt(actualVersion, latestVersion),
-      satisfied: semver.satisfies(actualVersion, versionSpec),
+      satisfied: semver.satisfies(latestVersion, versionSpec),
       deprecated: deprecations.length > 0,  // TODO: this will be going away once I get the github API integration up
       deprecations
     };
